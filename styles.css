@@ -71,7 +71,7 @@ body {
 }
 
 .zen-logo-img {
-    height: 72px;
+    height: 172px;
     width: auto;
     object-fit: contain;
     filter: drop-shadow(0 3px 6px rgba(110, 78, 49, 0.18));
@@ -128,7 +128,10 @@ body {
     position: relative;
     width: 100%;
     aspect-ratio: 1.4; /* Soft horizontal orientation */
-    background: linear-gradient(135deg, var(--wood-light) 0%, var(--wood-main) 50%, var(--wood-dark) 100%);
+    background-image: linear-gradient(135deg, rgba(244, 212, 178, 0.45) 0%, rgba(166, 124, 82, 0.6) 50%, rgba(110, 78, 49, 0.8) 100%), url('wood-grain-texture.jpg');
+    background-size: cover;
+    background-position: center;
+    background-blend-mode: multiply;
     border-radius: 12px;
     padding: 24px; /* Thick wooden frame rim */
     box-shadow: 
@@ -145,6 +148,10 @@ body {
 .sandbox-wood-inner {
     width: 100%;
     height: 100%;
+    background-image: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.1) 100%), url('wood-grain-texture.jpg');
+    background-size: cover;
+    background-position: center;
+    background-blend-mode: multiply;
     background-color: var(--wood-dark);
     border-radius: 6px;
     box-shadow: 
