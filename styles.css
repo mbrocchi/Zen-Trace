@@ -31,6 +31,11 @@
 body {
     font-family: var(--font-body);
     background-color: var(--bg-color);
+    background-image: linear-gradient(rgba(247, 243, 237, 0.85), rgba(247, 243, 237, 0.85)), url('background.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     color: var(--text-dark);
     min-height: 100vh;
     display: flex;
@@ -71,7 +76,7 @@ body {
 }
 
 .zen-logo-img {
-    height: 172px;
+    height: 222px;
     width: auto;
     object-fit: contain;
     filter: drop-shadow(0 3px 6px rgba(110, 78, 49, 0.18));
