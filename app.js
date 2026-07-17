@@ -145,7 +145,25 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.restore();
         });
 
-        // 3. Update active stroke counts
+        // 3. Draw Smoothing Stone active visualizer
+        if (isDrawing && activeTool === 'stone' && lastMousePos) {
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(lastMousePos.x, lastMousePos.y, 35, 0, Math.PI * 2);
+            const gradient = ctx.createRadialGradient(
+                lastMousePos.x, lastMousePos.y, 0,
+                lastMousePos.x, lastMousePos.y, 35
+            );
+            gradient.addColorStop(0, 'rgba(252, 249, 242, 0.95)');
+            gradient.addColorStop(0.4, 'rgba(252, 249, 242, 0.8)');
+            gradient.addColorStop(0.8, 'rgba(252, 249, 242, 0.3)');
+            gradient.addColorStop(1, 'rgba(252, 249, 242, 0)');
+            ctx.fillStyle = gradient;
+            ctx.fill();
+            ctx.restore();
+        }
+
+        // 4. Update active stroke counts
         const activeStrokes = strokes.filter(s => (virtualTime - s.timestamp) / (1000 * 60 * 60) < 6);
         statStrokes.textContent = `${activeStrokes.length} active trace${activeStrokes.length === 1 ? '' : 's'}`;
     }
@@ -155,45 +173,48 @@ document.addEventListener('DOMContentLoaded', () => {
         const pts = stroke.points;
         if (pts.length < 2) return;
 
-        // Sand Grooves require deep inner shadows and a bright raised lip side (pseudo-3D light from Top-Left)
-        
-        // A. Draw white highlight lip (offset slightly top-left: -0.8px, -0.8px)
-        ctx.beginPath();
-        ctx.strokeStyle = LIP_HIGHLIGHT;
-        ctx.lineWidth = 3.5;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        ctx.moveTo(pts[0].x - 0.8, pts[0].y - 0.8);
+        // Draw segment by segment to respect dynamic point strength (smoothing block)
         for (let i = 1; i < pts.length; i++) {
-            ctx.lineTo(pts[i].x - 0.8, pts[i].y - 0.8);
-        }
-        ctx.stroke();
+            const p1 = pts[i - 1];
+            const p2 = pts[i];
+            const avgStrength = (p1.strength + p2.strength) / 2;
+            if (avgStrength <= 0.05) continue;
 
-        // B. Draw main groove shadow (offset slightly bottom-right: 0.8px, 0.8px)
-        ctx.beginPath();
-        ctx.strokeStyle = GROOVE_SHADOW;
-        ctx.lineWidth = 3;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        ctx.moveTo(pts[0].x + 0.8, pts[0].y + 0.8);
-        for (let i = 1; i < pts.length; i++) {
-            ctx.lineTo(pts[i].x + 0.8, pts[i].y + 0.8);
-        }
-        ctx.stroke();
+            ctx.save();
+            ctx.globalAlpha = ctx.globalAlpha * avgStrength;
 
-        // C. Draw deep center trough
-        ctx.beginPath();
-        ctx.strokeStyle = GROOVE_DEEP;
-        ctx.lineWidth = 1.8;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        ctx.moveTo(pts[0].x, pts[0].y);
-        for (let i = 1; i < pts.length; i++) {
-            // Include tactile physical strength (affected by smoothing stone)
-            ctx.lineWidth = 1.8 * pts[i].strength;
-            ctx.lineTo(pts[i].x, pts[i].y);
+            // A. Draw white highlight lip (offset slightly top-left: -0.8px, -0.8px)
+            ctx.beginPath();
+            ctx.strokeStyle = LIP_HIGHLIGHT;
+            ctx.lineWidth = 3.5 * avgStrength;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.moveTo(p1.x - 0.8, p1.y - 0.8);
+            ctx.lineTo(p2.x - 0.8, p2.y - 0.8);
+            ctx.stroke();
+
+            // B. Draw main groove shadow (offset slightly bottom-right: 0.8px, 0.8px)
+            ctx.beginPath();
+            ctx.strokeStyle = GROOVE_SHADOW;
+            ctx.lineWidth = 3 * avgStrength;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.moveTo(p1.x + 0.8, p1.y + 0.8);
+            ctx.lineTo(p2.x + 0.8, p2.y + 0.8);
+            ctx.stroke();
+
+            // C. Draw deep center trough
+            ctx.beginPath();
+            ctx.strokeStyle = GROOVE_DEEP;
+            ctx.lineWidth = 1.8 * avgStrength;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+
+            ctx.restore();
         }
-        ctx.stroke();
     }
 
     // Helper to draw parallel rake paths
@@ -204,59 +225,61 @@ document.addEventListener('DOMContentLoaded', () => {
         // Wide wooden rake has 4 prongs
         const prongs = [-15, -5, 5, 15];
 
-        // Draw each prong trail individually so they look like organic, concurrent paths
-        prongs.forEach(offset => {
-            // For highlight lip (white, offset -1px)
-            ctx.beginPath();
-            ctx.strokeStyle = LIP_HIGHLIGHT;
-            ctx.lineWidth = 3;
-            ctx.lineCap = 'round';
-            ctx.lineJoin = 'round';
-            
-            let normal0 = getNormal(pts[0], pts[1], offset);
-            ctx.moveTo(pts[0].x + normal0.x - 0.8, pts[0].y + normal0.y - 0.8);
-            
-            for (let i = 1; i < pts.length; i++) {
-                const prev = pts[i - 1];
-                const curr = pts[i];
-                const next = pts[i + 1] || curr;
-                const norm = getNormal(prev, next, offset);
-                ctx.lineTo(curr.x + norm.x - 0.8, curr.y + norm.y - 0.8);
-            }
-            ctx.stroke();
+        for (let i = 1; i < pts.length; i++) {
+            const p1 = pts[i - 1];
+            const p2 = pts[i];
+            const avgStrength = (p1.strength + p2.strength) / 2;
+            if (avgStrength <= 0.05) continue;
 
-            // For dark depth shadow
-            ctx.beginPath();
-            ctx.strokeStyle = GROOVE_SHADOW;
-            ctx.lineWidth = 2.5;
-            ctx.lineCap = 'round';
-            ctx.lineJoin = 'round';
-            ctx.moveTo(pts[0].x + normal0.x + 0.8, pts[0].y + normal0.y + 0.8);
-            for (let i = 1; i < pts.length; i++) {
-                const prev = pts[i - 1];
-                const curr = pts[i];
-                const next = pts[i + 1] || curr;
-                const norm = getNormal(prev, next, offset);
-                ctx.lineTo(curr.x + norm.x + 0.8, curr.y + norm.y + 0.8);
-            }
-            ctx.stroke();
+            // Draw segment for each prong trail individually
+            prongs.forEach(offset => {
+                const nextPointForNormal = pts[i + 1] || p2;
+                const prevPointForNormal = pts[i - 2] || p1;
+                
+                const norm1 = getNormal(prevPointForNormal, p2, offset);
+                const norm2 = getNormal(p1, nextPointForNormal, offset);
 
-            // For deep center trough
-            ctx.beginPath();
-            ctx.strokeStyle = GROOVE_DEEP;
-            ctx.lineCap = 'round';
-            ctx.lineJoin = 'round';
-            ctx.moveTo(pts[0].x + normal0.x, pts[0].y + normal0.y);
-            for (let i = 1; i < pts.length; i++) {
-                const prev = pts[i - 1];
-                const curr = pts[i];
-                const next = pts[i + 1] || curr;
-                const norm = getNormal(prev, next, offset);
-                ctx.lineWidth = 1.2 * pts[i].strength;
-                ctx.lineTo(curr.x + norm.x, curr.y + norm.y);
-            }
-            ctx.stroke();
-        });
+                const x1 = p1.x + norm1.x;
+                const y1 = p1.y + norm1.y;
+                const x2 = p2.x + norm2.x;
+                const y2 = p2.y + norm2.y;
+
+                ctx.save();
+                ctx.globalAlpha = ctx.globalAlpha * avgStrength;
+
+                // For highlight lip
+                ctx.beginPath();
+                ctx.strokeStyle = LIP_HIGHLIGHT;
+                ctx.lineWidth = 3 * avgStrength;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.moveTo(x1 - 0.8, y1 - 0.8);
+                ctx.lineTo(x2 - 0.8, y2 - 0.8);
+                ctx.stroke();
+
+                // For dark depth shadow
+                ctx.beginPath();
+                ctx.strokeStyle = GROOVE_SHADOW;
+                ctx.lineWidth = 2.5 * avgStrength;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.moveTo(x1 + 0.8, y1 + 0.8);
+                ctx.lineTo(x2 + 0.8, y2 + 0.8);
+                ctx.stroke();
+
+                // For deep center trough
+                ctx.beginPath();
+                ctx.strokeStyle = GROOVE_DEEP;
+                ctx.lineWidth = 1.2 * avgStrength;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.stroke();
+
+                ctx.restore();
+            });
+        }
     }
 
     // Get Mouse/Touch coordinates relative to the canvas scale
@@ -339,6 +362,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!isDrawing) return;
         e.preventDefault(); // Stop scrolling on touch screen
         const pos = getEventCoordinates(e);
+        lastMousePos = pos;
 
         if (activeTool === 'stone') {
             applySmoothingStone(pos);

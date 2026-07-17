@@ -70,17 +70,16 @@ body {
     gap: 0.5rem;
 }
 
-.zen-logo-symbol {
-    font-size: 1.8rem;
-    color: var(--wood-main);
-    font-family: var(--font-heading);
-    animation: slow-spin 20s linear infinite;
-    display: inline-block;
+.zen-logo-img {
+    height: 72px;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 3px 6px rgba(110, 78, 49, 0.18));
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-@keyframes slow-spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+.zen-logo-img:hover {
+    transform: scale(1.08) rotate(3deg);
 }
 
 .app-header h1 {
