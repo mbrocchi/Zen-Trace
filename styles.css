@@ -1,0 +1,570 @@
+/* CSS Reset and Variables for Zen Vibe */
+:root {
+    --bg-color: #f7f3ed;
+    --wood-main: #a67c52;
+    --wood-dark: #6e4e31;
+    --wood-light: #c29d74;
+    --wood-grain: #8d6640;
+    --sand-color: #fcf9f2;
+    --sand-shadow: #ece5d8;
+    --sand-highlight: #ffffff;
+    --text-dark: #403225;
+    --text-muted: #8c7b6c;
+    --accent-soft: #d3ad8d;
+    --accent-active: #8e6843;
+    --panel-bg: rgba(255, 255, 255, 0.85);
+    --panel-border: rgba(166, 124, 82, 0.2);
+    --shadow-soft: rgba(110, 78, 49, 0.15);
+    --shadow-deep: rgba(110, 78, 49, 0.25);
+    --font-heading: 'Cinzel', serif;
+    --font-body: 'Quicksand', sans-serif;
+    --font-mono: 'Nunito Sans', sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: var(--font-body);
+    background-color: var(--bg-color);
+    color: var(--text-dark);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    overflow-x: hidden;
+    position: relative;
+    padding: 1.5rem;
+}
+
+/* Calm, slow glowing backdrop */
+.ambient-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80vw;
+    height: 80vh;
+    background: radial-gradient(circle, rgba(252, 249, 242, 0.7) 0%, rgba(247, 243, 237, 0) 70%);
+    z-index: -1;
+    pointer-events: none;
+}
+
+/* Header style - Quiet, functional, elegant */
+.app-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    z-index: 5;
+    user-select: none;
+}
+
+.header-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.zen-logo-symbol {
+    font-size: 1.8rem;
+    color: var(--wood-main);
+    font-family: var(--font-heading);
+    animation: slow-spin 20s linear infinite;
+    display: inline-block;
+}
+
+@keyframes slow-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.app-header h1 {
+    font-family: var(--font-heading);
+    font-weight: 400;
+    font-size: 2.2rem;
+    color: var(--text-dark);
+    letter-spacing: 0.15em;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.tagline {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    font-weight: 400;
+    letter-spacing: 0.05em;
+    margin-top: 0.25rem;
+}
+
+/* Core App container holding Sandbox and floating controls */
+.app-container {
+    width: 100%;
+    max-width: 1100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    flex-grow: 1;
+}
+
+/* Pseudo-isometric / 3D Wooden Sandbox wrapper */
+.sandbox-perspective-wrapper {
+    perspective: 1200px;
+    transform-style: preserve-3d;
+    margin: 2.5rem 0;
+    width: 100%;
+    max-width: 680px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Wooden Box styling - outer border */
+.sandbox-wood-outer {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1.4; /* Soft horizontal orientation */
+    background: linear-gradient(135deg, var(--wood-light) 0%, var(--wood-main) 50%, var(--wood-dark) 100%);
+    border-radius: 12px;
+    padding: 24px; /* Thick wooden frame rim */
+    box-shadow: 
+        0 20px 40px var(--shadow-deep),
+        0 5px 15px var(--shadow-soft),
+        inset 0 2px 4px rgba(255, 255, 255, 0.4),
+        inset 0 -2px 8px rgba(0, 0, 0, 0.3);
+    transform: rotateX(22deg) rotateY(0deg) rotateZ(0deg); /* Pure top-down pseudo-isometric rotation */
+    transform-style: preserve-3d;
+    transition: transform 0.5s ease;
+}
+
+/* inner wooden wall containing the sand bed */
+.sandbox-wood-inner {
+    width: 100%;
+    height: 100%;
+    background-color: var(--wood-dark);
+    border-radius: 6px;
+    box-shadow: 
+        inset 0 4px 10px rgba(0, 0, 0, 0.5),
+        inset 4px 0 10px rgba(0, 0, 0, 0.4),
+        0 1px 2px rgba(255,255,255,0.1);
+    padding: 6px; /* recess of the sand bed */
+    position: relative;
+}
+
+/* The Sand Bed */
+.sand-bed {
+    width: 100%;
+    height: 100%;
+    border-radius: 4px;
+    background-color: var(--sand-color);
+    position: relative;
+    overflow: hidden;
+    cursor: crosshair;
+}
+
+#sandCanvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Overlaying tactile noise or sparkling nodes to simulate physical sand grains */
+.sand-texture-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0.05;
+    background-image: radial-gradient(var(--text-dark) 1px, transparent 1px);
+    background-size: 3px 3px;
+}
+
+/* Inner wood rim shadows for 3D depth */
+.wood-rim-shadow-n {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    right: 24px;
+    height: 15px;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0) 100%);
+    pointer-events: none;
+}
+
+.wood-rim-shadow-w {
+    position: absolute;
+    top: 24px;
+    bottom: 24px;
+    left: 24px;
+    width: 15px;
+    background: linear-gradient(to right, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 100%);
+    pointer-events: none;
+}
+
+/* Status Text Overlay near the garden box */
+.status-overlay {
+    margin-top: 1.5rem;
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    padding: 0.6rem 1.2rem;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    color: var(--text-dark);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 10px var(--shadow-soft);
+    pointer-events: none;
+    transition: all 0.3s ease;
+    animation: gentle-float 4s ease-in-out infinite;
+}
+
+@keyframes gentle-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+
+/* Tool Palette Dock - Bottom Centered */
+.control-dock {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+    z-index: 10;
+}
+
+.tool-palette {
+    display: flex;
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    padding: 0.6rem;
+    border-radius: 40px;
+    gap: 0.5rem;
+    box-shadow: 
+        0 10px 25px var(--shadow-soft),
+        inset 0 1px 2px rgba(255,255,255,0.5);
+    backdrop-filter: blur(8px);
+}
+
+.tool-btn {
+    border: none;
+    background: transparent;
+    padding: 0.6rem 1.2rem;
+    border-radius: 30px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--text-muted);
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    outline: none;
+}
+
+.tool-icon-wrapper {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(166, 124, 82, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    transition: all 0.25s ease;
+}
+
+.tool-btn:hover {
+    color: var(--text-dark);
+    background: rgba(166, 124, 82, 0.05);
+}
+
+.tool-btn:hover .tool-icon-wrapper {
+    background: rgba(166, 124, 82, 0.15);
+    color: var(--text-dark);
+}
+
+.tool-btn.active {
+    color: var(--sand-color);
+    background: var(--accent-active);
+    box-shadow: 0 4px 12px rgba(142, 104, 67, 0.35);
+}
+
+.tool-btn.active .tool-icon-wrapper {
+    background: rgba(255, 255, 255, 0.2);
+    color: var(--sand-color);
+}
+
+/* Side Panel: Interview Tester Menu */
+.tester-panel {
+    position: fixed;
+    right: 20px;
+    top: 20px;
+    bottom: 20px;
+    width: 320px;
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 16px;
+    box-shadow: 0 15px 35px var(--shadow-deep);
+    z-index: 100;
+    backdrop-filter: blur(12px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+}
+
+/* Toggle state for responsive floating panel */
+.tester-panel.collapsed {
+    transform: translateX(calc(100% - 48px));
+}
+
+.tester-toggle-btn {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%) rotate(-90deg) translateY(-24px);
+    transform-origin: center center;
+    background: var(--wood-main);
+    color: white;
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 -3px 8px rgba(0, 0, 0, 0.15);
+    z-index: 101;
+    transition: background 0.2s;
+}
+
+.tester-toggle-btn:hover {
+    background: var(--wood-dark);
+}
+
+.tester-toggle-btn i {
+    transform: rotate(90deg); /* un-rotate icon */
+}
+
+.tester-content {
+    padding: 1.5rem;
+    overflow-y: auto;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.tester-content h3 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--text-dark);
+    border-bottom: 1px solid var(--panel-border);
+    padding-bottom: 0.5rem;
+}
+
+.tester-help {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.control-group label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+}
+
+.button-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.4rem;
+}
+
+.tester-btn {
+    border: 1px solid var(--panel-border);
+    background: white;
+    color: var(--text-dark);
+    padding: 0.55rem 0.75rem;
+    border-radius: 8px;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+}
+
+.tester-btn:hover {
+    background: var(--bg-color);
+    border-color: var(--wood-main);
+}
+
+.tester-btn:active {
+    transform: scale(0.97);
+}
+
+.btn-time {
+    color: var(--wood-dark);
+}
+
+.btn-action {
+    background: rgba(166, 124, 82, 0.08);
+    border-color: rgba(166, 124, 82, 0.2);
+    width: 100%;
+    margin-bottom: 0.25rem;
+}
+
+.btn-action:hover {
+    background: rgba(166, 124, 82, 0.15);
+}
+
+.btn-danger {
+    background: rgba(193, 110, 110, 0.08);
+    border-color: rgba(193, 110, 110, 0.2);
+    color: #a44e4e;
+    width: 100%;
+}
+
+.btn-danger:hover {
+    background: rgba(193, 110, 110, 0.15);
+    border-color: #a44e4e;
+}
+
+.physics-stats {
+    background: rgba(166, 124, 82, 0.04);
+    border: 1px dashed var(--panel-border);
+    border-radius: 10px;
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-top: auto;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.stat-row span:last-child {
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.text-center {
+    text-align: center;
+}
+
+/* Footer Section - Design Philosophy description */
+.app-footer {
+    width: 100%;
+    max-width: 750px;
+    margin-top: 2rem;
+    text-align: center;
+    z-index: 5;
+    user-select: none;
+}
+
+.concept-explanation {
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    border: 1px solid rgba(166, 124, 82, 0.1);
+}
+
+.concept-explanation p {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--text-muted);
+}
+
+.concept-explanation strong {
+    color: var(--text-dark);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1050px) {
+    /* Push the tester menu onto screen better or handle standard toggle */
+    .tester-panel {
+        transform: translateX(calc(100% - 48px));
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 1rem;
+    }
+
+    .app-header h1 {
+        font-size: 1.7rem;
+    }
+
+    .sandbox-perspective-wrapper {
+        perspective: 800px;
+        margin: 1rem 0;
+    }
+
+    .sandbox-wood-outer {
+        padding: 16px;
+        border-radius: 8px;
+        transform: rotateX(15deg) rotateY(0deg) rotateZ(0deg);
+    }
+
+    .wood-rim-shadow-n, .wood-rim-shadow-w {
+        display: none; /* simplifies calculation and assets for small screens */
+    }
+
+    .tester-panel {
+        width: 290px;
+    }
+
+    .tool-palette {
+        padding: 0.4rem;
+    }
+
+    .tool-btn {
+        padding: 0.5rem 0.9rem;
+        font-size: 0.85rem;
+    }
+
+    .tool-icon-wrapper {
+        width: 26px;
+        height: 26px;
+    }
+}
+
+@media (max-width: 480px) {
+    .tool-label {
+        display: none; /* Only icons on mobile to fit beautifully */
+    }
+    
+    .tool-btn {
+        padding: 0.6rem 1rem;
+    }
+}

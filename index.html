@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zen Trace - Digital Zen Garden</title>
+    <!-- Google Fonts for a minimalist, calming typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Nunito+Sans:ital,opsz,wght@0,6..12,300;0,6..12,400;0,6..12,500;1,6..12,400&family=Quicksand:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- FontAwesome for warm, clean tool icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Background ambiance layer -->
+    <div class="ambient-glow"></div>
+
+    <header class="app-header">
+        <div class="header-logo">
+            <span class="zen-logo-symbol">○</span>
+            <h1>Zen Trace</h1>
+        </div>
+        <p class="tagline">An asynchronous, low-friction connection for FIFO families.</p>
+    </header>
+
+    <main class="app-container">
+        <!-- Main Sandbox Container (Isometric view wrapper) -->
+        <div class="sandbox-perspective-wrapper">
+            <div class="sandbox-wood-outer">
+                <div class="sandbox-wood-inner">
+                    <!-- The Sand Bed -->
+                    <div class="sand-bed" id="sandBed">
+                        <canvas id="sandCanvas"></canvas>
+                        <!-- Tactile ambient dust/sparkle overlay to give texture to the sand -->
+                        <div class="sand-texture-overlay"></div>
+                    </div>
+                </div>
+                <!-- Wooden Box Rim Shadow Details -->
+                <div class="wood-rim-shadow-n"></div>
+                <div class="wood-rim-shadow-w"></div>
+            </div>
+            
+            <!-- Dynamic Status Overlay nearby the garden -->
+            <div class="status-overlay" id="statusOverlay">
+                <i class="fa-regular fa-clock"></i>
+                <span id="statusText">The sand lies undisturbed and quiet.</span>
+            </div>
+        </div>
+
+        <!-- Bottom Tactile Tool Palette -->
+        <div class="control-dock">
+            <div class="tool-palette">
+                <button class="tool-btn active" id="toolStylus" data-tool="stylus" title="Fine Stylus - sharp, thin lines for writing and sketching">
+                    <div class="tool-icon-wrapper">
+                        <i class="fa-solid fa-pen-fancy"></i>
+                    </div>
+                    <span class="tool-label">Fine Stylus</span>
+                </button>
+                <button class="tool-btn" id="toolRake" data-tool="rake" title="Wide Rake - wide, parallel multi-grooved sand textures">
+                    <div class="tool-icon-wrapper">
+                        <i class="fa-solid fa-bars"></i>
+                    </div>
+                    <span class="tool-label">Wide Rake</span>
+                </button>
+                <button class="tool-btn" id="toolStone" data-tool="stone" title="Smoothing Stone - tap and drag to flatten the sand bed">
+                    <div class="tool-icon-wrapper">
+                        <i class="fa-solid fa-circle"></i>
+                    </div>
+                    <span class="tool-label">Smoothing Stone</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Side Panel: Interview Tester Controls -->
+        <div class="tester-panel" id="testerPanel">
+            <button class="tester-toggle-btn" id="testerToggle" title="Toggle Tester Controls">
+                <i class="fa-solid fa-sliders"></i>
+                <span>Tester Menu</span>
+            </button>
+            <div class="tester-content">
+                <h3>Interview Tester Controls</h3>
+                <p class="tester-help">Use these controls to simulate asynchronous participation and the 6-hour fade loop in real-time.</p>
+                
+                <div class="control-group">
+                    <label>Simulate Time Passage</label>
+                    <div class="button-grid">
+                        <button class="tester-btn btn-time" data-hours="1">
+                            <i class="fa-solid fa-hourglass-half"></i> +1 Hour
+                        </button>
+                        <button class="tester-btn btn-time" data-hours="2">
+                            <i class="fa-solid fa-hourglass-half"></i> +2 Hours
+                        </button>
+                        <button class="tester-btn btn-time" data-hours="4">
+                            <i class="fa-solid fa-hourglass-half"></i> +4 Hours
+                        </button>
+                        <button class="tester-btn btn-time" data-hours="6">
+                            <i class="fa-solid fa-hourglass"></i> +6 Hours (Reset)
+                        </button>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>Simulate Partner Activity</label>
+                    <button class="tester-btn btn-action" id="btnSimulatePartner">
+                        <i class="fa-solid fa-user-friends"></i> Partner Activity (Raked Sand 3 hrs ago)
+                    </button>
+                    <button class="tester-btn btn-action" id="btnSimulatePartnerText">
+                        <i class="fa-solid fa-heart"></i> Partner Note ("Miss u" 1 hr ago)
+                    </button>
+                </div>
+
+                <div class="control-group text-center">
+                    <label>Canvas Clearing</label>
+                    <button class="tester-btn btn-danger" id="btnClearCanvas">
+                        <i class="fa-solid fa-trash-can"></i> Smooth the Sand Bed
+                    </button>
+                </div>
+
+                <div class="physics-stats">
+                    <div class="stat-row">
+                        <span>Current Time:</span>
+                        <span id="statTime">09:50 AM</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>Stroke Count:</span>
+                        <span id="statStrokes">0 active</span>
+                    </div>
+                    <div class="stat-row">
+                        <span>Fading Rate:</span>
+                        <span>6 Hours to Flat</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="app-footer">
+        <div class="concept-explanation">
+            <p><strong>Design Philosophy:</strong> Zero notifications. Zero read receipts. No unread counts or turn-taking blocks. Just shared, quiet, tactile sand. When your partner touches their sand bed, your garden shifts and fades smoothly over six hours, mirroring the natural rhythm of day and night on shifts.</p>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
